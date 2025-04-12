@@ -1,0 +1,338 @@
+openapi: 3.0.0
+info:
+  title: WeLocal Small Business Service API
+  description: API для управления малым бизнесом
+  version: 1.0.0
+
+servers:
+  - url: http://localhost:10411
+    description: Локальный сервер разработки
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  schemas:
+    Business:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+        description:
+          type: string
+        ownerId:
+          type: string
+          format: uuid
+        category:
+          type: string
+        address:
+          type: object
+          properties:
+            street:
+              type: string
+            city:
+              type: string
+            state:
+              type: string
+            zipCode:
+              type: string
+            country:
+              type: string
+        contactInfo:
+          type: object
+          properties:
+            phone:
+              type: string
+            email:
+              type: string
+            website:
+              type: string
+        workingHours:
+          type: object
+          properties:
+            monday:
+              type: string
+            tuesday:
+              type: string
+            wednesday:
+              type: string
+            thursday:
+              type: string
+            friday:
+              type: string
+            saturday:
+              type: string
+            sunday:
+              type: string
+        status:
+          type: string
+          enum: [ACTIVE, INACTIVE, PENDING]
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+
+paths:
+  /businesses:
+    get:
+      summary: Получение списка бизнесов
+      tags:
+        - Бизнесы
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: query
+          name: category
+          schema:
+            type: string
+        - in: query
+          name: status
+          schema:
+            type: string
+            enum: [ACTIVE, INACTIVE, PENDING]
+        - in: query
+          name: page
+          schema:
+            type: integer
+            default: 1
+        - in: query
+          name: limit
+          schema:
+            type: integer
+            default: 10
+      responses:
+        '200':
+          description: Успешное получение списка бизнесов
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Business'
+                  total:
+                    type: integer
+                  page:
+                    type: integer
+                  limit:
+                    type: integer
+        '401':
+          description: Не авторизован
+        '500':
+          description: Внутренняя ошибка сервера
+
+    post:
+      summary: Создание нового бизнеса
+      tags:
+        - Бизнесы
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - name
+                - description
+                - category
+                - address
+                - contactInfo
+              properties:
+                name:
+                  type: string
+                description:
+                  type: string
+                category:
+                  type: string
+                address:
+                  type: object
+                  required:
+                    - street
+                    - city
+                    - state
+                    - zipCode
+                    - country
+                  properties:
+                    street:
+                      type: string
+                    city:
+                      type: string
+                    state:
+                      type: string
+                    zipCode:
+                      type: string
+                    country:
+                      type: string
+                contactInfo:
+                  type: object
+                  required:
+                    - phone
+                    - email
+                  properties:
+                    phone:
+                      type: string
+                    email:
+                      type: string
+                    website:
+                      type: string
+                workingHours:
+                  type: object
+                  properties:
+                    monday:
+                      type: string
+                    tuesday:
+                      type: string
+                    wednesday:
+                      type: string
+                    thursday:
+                      type: string
+                    friday:
+                      type: string
+                    saturday:
+                      type: string
+                    sunday:
+                      type: string
+      responses:
+        '201':
+          description: Бизнес успешно создан
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Business'
+        '400':
+          description: Неверные данные
+        '401':
+          description: Не авторизован
+        '500':
+          description: Внутренняя ошибка сервера
+
+  /businesses/{id}:
+    parameters:
+      - in: path
+        name: id
+        required: true
+        schema:
+          type: string
+          format: uuid
+    get:
+      summary: Получение информации о бизнесе
+      tags:
+        - Бизнесы
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Успешное получение информации о бизнесе
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Business'
+        '404':
+          description: Бизнес не найден
+        '500':
+          description: Внутренняя ошибка сервера
+
+    put:
+      summary: Обновление информации о бизнесе
+      tags:
+        - Бизнесы
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                description:
+                  type: string
+                category:
+                  type: string
+                address:
+                  type: object
+                  properties:
+                    street:
+                      type: string
+                    city:
+                      type: string
+                    state:
+                      type: string
+                    zipCode:
+                      type: string
+                    country:
+                      type: string
+                contactInfo:
+                  type: object
+                  properties:
+                    phone:
+                      type: string
+                    email:
+                      type: string
+                    website:
+                      type: string
+                workingHours:
+                  type: object
+                  properties:
+                    monday:
+                      type: string
+                    tuesday:
+                      type: string
+                    wednesday:
+                      type: string
+                    thursday:
+                      type: string
+                    friday:
+                      type: string
+                    saturday:
+                      type: string
+                    sunday:
+                      type: string
+                status:
+                  type: string
+                  enum: [ACTIVE, INACTIVE, PENDING]
+      responses:
+        '200':
+          description: Бизнес успешно обновлен
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Business'
+        '400':
+          description: Неверные данные
+        '401':
+          description: Не авторизован
+        '404':
+          description: Бизнес не найден
+        '500':
+          description: Внутренняя ошибка сервера
+
+    delete:
+      summary: Удаление бизнеса
+      tags:
+        - Бизнесы
+      security:
+        - bearerAuth: []
+      responses:
+        '204':
+          description: Бизнес успешно удален
+        '401':
+          description: Не авторизован
+        '404':
+          description: Бизнес не найден
+        '500':
+          description: Внутренняя ошибка сервера 
